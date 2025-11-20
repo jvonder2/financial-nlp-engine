@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Yahoo Finance scraper for fetching company financial data
+Similar structure to scrap_sec.py but for Yahoo Finance API
 """
 
 import yfinance as yf
@@ -56,11 +57,19 @@ def get_financial_statements(ticker: str) -> Dict:
     try:
         stock = yf.Ticker(ticker)
         
+        # Helper function to convert DataFrame with Timestamp columns to dict
+        def df_to_dict(df):
+            if df.empty:
+                return {}
+            # Convert column names (dates) to strings first
+            df.columns = df.columns.astype(str)
+            return df.to_dict()
+        
         financial_data = {
-            'income_statement': stock.financials.to_dict() if not stock.financials.empty else {},
-            'balance_sheet': stock.balance_sheet.to_dict() if not stock.balance_sheet.empty else {},
-            'cash_flow': stock.cashflow.to_dict() if not stock.cashflow.empty else {},
-            'quarterly_income': stock.quarterly_financials.to_dict() if not stock.quarterly_financials.empty else {}
+            'income_statement': df_to_dict(stock.financials),
+            'balance_sheet': df_to_dict(stock.balance_sheet),
+            'cash_flow': df_to_dict(stock.cashflow),
+            'quarterly_income': df_to_dict(stock.quarterly_financials)
         }
         
         return financial_data
@@ -82,10 +91,22 @@ def get_earnings_history(ticker: str) -> Dict:
     try:
         stock = yf.Ticker(ticker)
         
+        # Helper function to safely convert DataFrames
+        def safe_to_dict(df):
+            if df is None or (hasattr(df, 'empty') and df.empty):
+                return {}
+            # Convert any Timestamp columns/index to strings
+            df = df.copy()
+            if hasattr(df, 'columns'):
+                df.columns = df.columns.astype(str)
+            if hasattr(df, 'index'):
+                df.index = df.index.astype(str)
+            return df.to_dict()
+        
         earnings_data = {
-            'earnings': stock.earnings.to_dict() if hasattr(stock, 'earnings') and not stock.earnings.empty else {},
-            'quarterly_earnings': stock.quarterly_earnings.to_dict() if hasattr(stock, 'quarterly_earnings') and not stock.quarterly_earnings.empty else {},
-            'earnings_dates': stock.earnings_dates.to_dict() if hasattr(stock, 'earnings_dates') and stock.earnings_dates is not None else {}
+            'earnings': safe_to_dict(stock.earnings) if hasattr(stock, 'earnings') else {},
+            'quarterly_earnings': safe_to_dict(stock.quarterly_earnings) if hasattr(stock, 'quarterly_earnings') else {},
+            'earnings_dates': safe_to_dict(stock.earnings_dates) if hasattr(stock, 'earnings_dates') else {}
         }
         
         return earnings_data
