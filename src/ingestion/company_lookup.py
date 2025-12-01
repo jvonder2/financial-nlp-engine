@@ -175,22 +175,3 @@ def search_companies(query: str, limit: int = 10) -> List[Dict]:
     """
     lookup = CompanyLookup()
     return lookup.search_company(query)[:limit]
-
-
-if __name__ == "__main__":
-    # Example usage
-    lookup = CompanyLookup()
-    
-    # Search by ticker
-    print("Searching for NVIDIA by ticker 'NVDA':")
-    company = lookup.get_company_by_ticker('NVDA')
-    print(f"Result: {company}")
-    
-    # Search by name
-    print("\nSearching for Apple by name:")
-    company = lookup.get_company_by_name('Apple')
-    print(f"Result: {company}")
-    
-    # Quick lookup
-    print(f"\nQuick lookup for AAPL: {get_cik_by_name_or_ticker('AAPL')}")
-    print(f"Quick lookup for Microsoft: {get_cik_by_name_or_ticker('Microsoft')}")
