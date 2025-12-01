@@ -8,7 +8,7 @@ def _get_api_key() -> str:
     """
     Internal helper function to fetch the FRED API key from the environment variable FRED_API_KEY
     """
-    api_key = os.getenv("FRED_API_KEY") # Read the environment variable named "FRED_API_KEY" and returns the value if there is one, returns none if not
+    api_key = os.getenv("FRED_API_KEY") # Read the environment variable names "FRED_API_KEY" and returns the value if there is one, returns none if not
     if not api_key:
         raise RuntimeError("FRED_API_KEY environment variable not set.") # Shows we can't call the FRED API properly, so it prints an error
     return api_key # If the key does exist, return it
